@@ -1,6 +1,6 @@
-package com.petstore.integration.tests;
+package io.github.timofeevvr.petstore;
 
-import com.petstore.integration.tests.model.Pet;
+import io.github.timofeevvr.petstore.model.Pet;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestInstance;
@@ -19,14 +19,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
 @Tag("pet")
-@SpringBootTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class PetApiIntegrationTest {
-
-    @Autowired
-    private DataProvider dataProvider;
-    @Autowired
-    private ApiClient petstoreClient;
+class PetApiIntegrationTest extends TestBase {
 
     @ParameterizedTest
     @MethodSource("petProvider")
@@ -99,10 +92,6 @@ class PetApiIntegrationTest {
                 .status()
                 .assertThat()
                 .statusCode(HTTP_NOT_FOUND);
-    }
-
-    Stream<Pet> petProvider() {
-        return Arrays.stream(dataProvider.fromJson("pets.json", Pet[].class));
     }
 
 }

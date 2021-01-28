@@ -1,4 +1,4 @@
-package com.petstore.integration.tests;
+package io.github.timofeevvr.petstore;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;

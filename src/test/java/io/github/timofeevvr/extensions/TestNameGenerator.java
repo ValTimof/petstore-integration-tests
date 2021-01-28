@@ -1,4 +1,4 @@
-package com.petstore.integration.tests;
+package io.github.timofeevvr.extensions;
 
 import org.junit.jupiter.api.DisplayNameGenerator;
 

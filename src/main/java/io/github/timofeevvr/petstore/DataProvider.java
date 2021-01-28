@@ -1,4 +1,4 @@
-package com.petstore.integration.tests;
+package io.github.timofeevvr.petstore;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;

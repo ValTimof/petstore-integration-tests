@@ -1,5 +1,2 @@
 petstore:
-  baseUrl: https://petstore.swagger.io/v2
-spring:
-  gson:
-#    date-format:
+  baseUrl: ${PETSTORE_URL:https://petstore.swagger.io/v2}
