@@ -1,0 +1,8 @@
+{
+  "library": "rest-assured",
+  "modelPackage": "com.petstore.integration.tests.model",
+  "apiPackage": "com.petstore.integration.tests.api",
+  "invokerPackage": "com.petstore.integration.tests",
+  "dateLibrary": "java8",
+  "hideGenerationTimestamp": true
+}

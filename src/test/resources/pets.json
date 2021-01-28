@@ -1,0 +1,70 @@
+[
+  {
+    "category": {
+      "id": 0,
+      "name": "home"
+    },
+    "name": "duplicate",
+    "photoUrls": [
+      "string"
+    ],
+    "tags": [
+      {
+        "id": 0,
+        "name": "pet"
+      }
+    ],
+    "status": "available"
+  },
+  {
+    "category": {
+      "id": 0,
+      "name": "home"
+    },
+    "name": "duplicate",
+    "photoUrls": [
+      "string"
+    ],
+    "tags": [
+      {
+        "id": 0,
+        "name": "pet"
+      }
+    ],
+    "status": "available"
+  },
+  {
+    "category": {
+      "id": 0,
+      "name": "home"
+    },
+    "name": "cat1",
+    "photoUrls": [
+    ],
+    "tags": [
+      {
+        "id": 0,
+        "name": "pet"
+      }
+    ],
+    "status": "unavailable"
+  },
+  {
+    "category": {
+      "id": 123,
+      "name": "beast"
+    },
+    "name": "cow",
+    "photoUrls": [
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "https://www.google.com/"
+    ],
+    "tags": [
+      {
+        "id": 1,
+        "name": "farm"
+      }
+    ],
+    "status": "available"
+  }
+]

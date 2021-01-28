@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <properties>
+        <property name="pattern">[%d{HH:mm:ss}] [%t] %-4p (%F:%L) - %m%n</property>
+    </properties>
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern}"/>
+        </Console>
+    </appenders>
+    <loggers>
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+        </root>
+    </loggers>
+</configuration>
