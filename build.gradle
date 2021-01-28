@@ -23,27 +23,36 @@ dependencyManagement {
         mavenBom('org.junit:junit-bom:5.7.0')
         mavenBom('org.springframework.boot:spring-boot-dependencies:2.3.8.RELEASE') {
             bomProperties([
+                    'rest-assured.version' : '3.3.0',
                     'junit-jupiter.version': '5.7.0',
-                    'rest-assured.version' : '4.3.3',
                     'assertj.version'      : '3.19.0'
             ])
         }
     }
 }
 
+ext {
+    swagger_codegen_version = "2.4.2"
+    swagger_annotations_version = "1.5.15"
+    gson_fire_version = "1.8.2"
+    okio_version = "1.13.0"
+}
+
 dependencies {
-    swaggerCodegen 'io.swagger:swagger-codegen-cli:2.4.2'
-    implementation 'io.swagger:swagger-annotations:1.5.15'
-    implementation 'io.gsonfire:gson-fire:1.8.2'
-    implementation 'com.squareup.okio:okio:1.13.0'
+    swaggerCodegen "io.swagger:swagger-codegen-cli:$swagger_codegen_version"
+
+    compile "io.swagger:swagger-annotations:$swagger_annotations_version"
+    compile "io.gsonfire:gson-fire:$gson_fire_version"
+    compile "com.squareup.okio:okio:$okio_version"
+
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    implementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'io.rest-assured:rest-assured'
     implementation 'org.apache.logging.log4j:log4j-iostreams'
 
     implementation 'io.qameta.allure:allure-junit5:2.13.7'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.platform:junit-platform-console'
 }
 
@@ -80,15 +89,15 @@ test {
             'junit.jupiter.extensions.autodetection.enabled': System.getProperty('rp.enable', 'false'),
             'rp.enable'                                     : System.getProperty('rp.enable', 'false')
     ])
-
 }
 
 task downloadSwaggerJson {
     doLast {
-        def file = new FileOutputStream('swagger-json/petstore.json')
-        def out = new BufferedOutputStream(file)
-        out << new URL('https://petstore.swagger.io/v2/swagger.json').openStream()
-        out.close()
+        file('swagger-json/petstore.json').withOutputStream {os ->
+            new URL('https://petstore.swagger.io/v2/swagger.json').withInputStream {is ->
+                os << is
+            }
+        }
     }
 }
 
@@ -103,7 +112,7 @@ swaggerSources {
                     modelDocs      : false,
                     apis           : ['Store', 'Pet'],
                     apiTests       : false,
-                    supportingFiles: ['ApiClient.java', 'JSON.java']
+                    supportingFiles: ['ApiClient.java', 'GsonObjectMapper.java', 'JSON.java']
             ]
         }
     }

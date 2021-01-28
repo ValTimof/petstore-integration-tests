@@ -17,7 +17,7 @@ class TestBase {
     @Autowired
     DataProvider dataProvider;
     @Autowired
-    ApiClient petstoreClient;
+    PetstoreSteps petstoreSteps;
 
     Stream<Pet> petProvider() {
         return Arrays.stream(dataProvider.fromJson("testdata/pets.json", Pet[].class));
