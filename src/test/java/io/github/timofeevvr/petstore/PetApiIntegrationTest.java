@@ -16,15 +16,12 @@ import static org.hamcrest.Matchers.notNullValue;
 class PetApiIntegrationTest extends TestBase {
 
     @ParameterizedTest
-    @MethodSource("petProvider")
-    void givenValidPet_whenAddPet_thenPetIsAddedSuccessfully(Pet pet) {
-        log.info("WHEN. ADD PET");
+    @MethodSource("io.github.timofeevvr.petstore.DataProvider#petProvider")
+    void addPetSuccessfullyAddsPetToTheStore(Pet pet) {
         Long createdPetId = petstoreSteps.pet().addPet()
                 .body(pet)
                 .execute(response -> response)
                 .then()
-                .log()
-                .status()
                 .assertThat()
                 .statusCode(HTTP_OK)
                 .body(notNullValue())
@@ -52,8 +49,8 @@ class PetApiIntegrationTest extends TestBase {
     }
 
     @ParameterizedTest
-    @MethodSource("petProvider")
-    void givenPetExitsInService_whenDeletePet_thenPetIsRemoved(Pet pet) {
+    @MethodSource("io.github.timofeevvr.petstore.DataProvider#petProvider")
+    void deletePetSuccessfullyRemovesPetFromTheStore(Pet pet) {
         log.info("GIVEN. ADD PET");
         Long createdPetId = petstoreSteps.pet().addPet()
                 .body(pet)

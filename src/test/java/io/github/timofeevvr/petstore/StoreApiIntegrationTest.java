@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
@@ -22,7 +23,7 @@ class StoreApiIntegrationTest extends TestBase {
     void givenExistingPet_whenPlaceOrderForThePet_thenOrderStatusIsPlaced(long orderId) {
         log.info("WHEN. FIND AVAILABLE PET ID");
         Long existingPetId = petstoreSteps.pet()
-                .reqSpec(r -> r.addFilter(new ErrorLoggingFilter()))
+                //TODO .reqSpec(r -> r.addFilter(new ErrorLoggingFilter()))
                 .findPetsByStatus()
                 .statusQuery(Pet.StatusEnum.AVAILABLE)
                 .execute(response -> response)
@@ -46,7 +47,7 @@ class StoreApiIntegrationTest extends TestBase {
                 .then()
                 .assertThat()
                 .statusCode(HTTP_OK)
-                .body("petId", equalTo(order.getPetId()));
+                .body("petId", is(order.getPetId()));
         log.info("THEN. CHECK ORDER IS PLACED");
         petstoreSteps.store().getOrderById()
                 .orderIdPath(orderId)

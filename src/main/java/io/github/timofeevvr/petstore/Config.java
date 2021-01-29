@@ -2,10 +2,16 @@ package io.github.timofeevvr.petstore;
 
 import io.restassured.RestAssured;
 import io.restassured.config.LogConfig;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.assertj.core.api.Assertions;
+import org.springframework.beans.factory.config.CustomScopeConfigurer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.SimpleThreadScope;
 
 import javax.annotation.PostConstruct;
 import java.io.PrintStream;
@@ -17,13 +23,27 @@ import static io.github.timofeevvr.petstore.GsonObjectMapper.gson;
 public class Config {
 
     @PostConstruct
-    void configure() {
+    void configureFramework() {
+        // print AssertJ assert descriptions
         Assertions.setPrintAssertionsDescription(true);
 
-        PrintStream logStream = IoBuilder.forLogger(log.getName()).buildPrintStream();
-
+        // RestAssured global configuration
         RestAssured.objectMapper(gson());
-        RestAssured.config = RestAssured.config().logConfig(LogConfig.logConfig().defaultStream(logStream));
+//        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+
+        PrintStream logStream = IoBuilder.forLogger(log.getName()).buildPrintStream();
+        RestAssured.filters(RequestLoggingFilter.logRequestTo(logStream));
+        RestAssured.filters(ResponseLoggingFilter.logResponseTo(logStream));
+    }
+
+    /**
+     * Add 'threadlocal' scope to create new object for each thread
+     */
+    @Bean
+    public static CustomScopeConfigurer threadLocalScopeRegistration() {
+        CustomScopeConfigurer scopeConfigurer = new CustomScopeConfigurer();
+        scopeConfigurer.addScope("threadlocal", new SimpleThreadScope());
+        return scopeConfigurer;
     }
 
 }
