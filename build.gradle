@@ -30,21 +30,22 @@ dependencyManagement {
             ])
         }
     }
-}
-
-ext {
-    swagger_codegen_version = "2.4.2"
-    swagger_annotations_version = "1.5.15"
-    gson_fire_version = "1.8.2"
-    okio_version = "1.13.0"
+    dependencies {
+        dependency 'io.swagger:swagger-codegen-cli:2.4.2'
+        dependency 'io.swagger:swagger-annotations:1.5.15'
+        dependency 'io.gsonfire:gson-fire:1.8.2'
+        dependency 'com.squareup.okio:okio:1.13.0'
+        dependency 'com.epam.reportportal:client-java:5.0.12'
+        dependency 'io.qameta.allure:allure-junit5:2.13.8'
+    }
 }
 
 dependencies {
-    swaggerCodegen "io.swagger:swagger-codegen-cli:$swagger_codegen_version"
+    swaggerCodegen 'io.swagger:swagger-codegen-cli'
 
-    compile "io.swagger:swagger-annotations:$swagger_annotations_version"
-    compile "io.gsonfire:gson-fire:$gson_fire_version"
-    compile "com.squareup.okio:okio:$okio_version"
+    implementation 'io.swagger:swagger-annotations'
+    implementation 'io.gsonfire:gson-fire'
+    implementation 'com.squareup.okio:okio'
 
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
@@ -52,7 +53,8 @@ dependencies {
     implementation 'io.rest-assured:rest-assured'
     implementation 'org.apache.logging.log4j:log4j-iostreams'
 
-    implementation 'io.qameta.allure:allure-junit5:2.13.7'
+    implementation 'com.epam.reportportal:client-java'
+    implementation 'io.qameta.allure:allure-junit5'
 
     testImplementation 'org.junit.platform:junit-platform-console'
 }
@@ -63,10 +65,10 @@ configurations.all {
 
 allure {
     autoconfigure = true
-    version = '2.13.7'
+    version = '2.13.8'
 
     useJUnit5 {
-        version = '2.13.7'
+        version = '2.13.8'
     }
 }
 
@@ -90,6 +92,12 @@ test {
             'junit.jupiter.extensions.autodetection.enabled': System.getProperty('rp.enable', 'false'),
             'rp.enable'                                     : System.getProperty('rp.enable', 'false')
     ])
+
+    doFirst {
+        // add aspectJ javaagent for ReportPortal @Step to be loaded
+        def weaver = configurations.testRuntimeClasspath.find { it.name.contains("aspectjweaver") }
+        jvmArgs += "-javaagent:$weaver"
+    }
 }
 
 task downloadSwaggerJson {

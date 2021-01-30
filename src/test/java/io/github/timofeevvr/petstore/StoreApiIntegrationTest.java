@@ -21,40 +21,18 @@ class StoreApiIntegrationTest extends TestBase {
     @ParameterizedTest
     @ValueSource(longs = {1, 2, 5, 10})
     void givenExistingPet_whenPlaceOrderForThePet_thenOrderStatusIsPlaced(long orderId) {
-        log.info("WHEN. FIND AVAILABLE PET ID");
-        Long existingPetId = petstoreSteps.pet()
-                //TODO .reqSpec(r -> r.addFilter(new ErrorLoggingFilter()))
-                .findPetsByStatus()
-                .statusQuery(Pet.StatusEnum.AVAILABLE)
-                .execute(response -> response)
-                .then().log().status()
-                .assertThat()
-                .statusCode(HTTP_OK)
-                .body(notNullValue())
-                .body("size()", greaterThan(0))
-                .extract()
-                .as(Pet[].class)[0]
-                .getId();
+        // given
+        Long existingPetId = petstoreSteps.findPetsByStatus(Pet.StatusEnum.AVAILABLE)[0].getId();
         Order order = new Order()
                 .id(orderId)
                 .petId(existingPetId)
                 .quantity(1)
                 .status(Order.StatusEnum.PLACED);
-        log.info("WHEN. PLACE ORDER");
-        petstoreSteps.store().placeOrder()
-                .body(order)
-                .execute(response -> response)
-                .then()
+        // when
+        petstoreSteps.placeOrder(order);
+        // then
+        petstoreSteps.getExistingOrder(orderId)
                 .assertThat()
-                .statusCode(HTTP_OK)
-                .body("petId", is(order.getPetId()));
-        log.info("THEN. CHECK ORDER IS PLACED");
-        petstoreSteps.store().getOrderById()
-                .orderIdPath(orderId)
-                .execute(response -> response)
-                .then()
-                .assertThat()
-                .statusCode(HTTP_OK)
                 .body("status", equalTo(Order.StatusEnum.PLACED.getValue()));
     }
 }
