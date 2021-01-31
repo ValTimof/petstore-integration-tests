@@ -22,8 +22,8 @@ class StoreApiIntegrationTest extends TestBase {
     @ValueSource(longs = {1, 2, 5, 10})
     void givenExistingPet_whenPlaceOrderForThePet_thenOrderStatusIsPlaced(long orderId) {
         // given
-        Long existingPetId = petstoreSteps.findPetsByStatus(Pet.StatusEnum.AVAILABLE)[0].getId();
-        Order order = new Order()
+        var existingPetId = petstoreSteps.findPetsByStatus(Pet.StatusEnum.AVAILABLE)[0].getId();
+        var order = new Order()
                 .id(orderId)
                 .petId(existingPetId)
                 .quantity(1)

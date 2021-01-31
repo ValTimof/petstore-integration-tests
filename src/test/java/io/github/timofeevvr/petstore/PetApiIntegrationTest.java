@@ -24,9 +24,9 @@ class PetApiIntegrationTest extends TestBase {
         createdPets.forEach(petstoreSteps::deletePet);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} {index}")
     @MethodSource("io.github.timofeevvr.petstore.DataProvider#petProvider")
-    void addPetSuccessfullyAddsPetToTheStore(Pet pet) {
+    void petPostMethodSuccessfullyAddsPetToTheStore(Pet pet) {
         // when
         var createdPetId = petstoreSteps.addPet(pet).getId();
         // then
@@ -34,7 +34,7 @@ class PetApiIntegrationTest extends TestBase {
         createdPets.add(createdPet);
 
         assertThat(createdPet)
-                .as("Check the pet created correctly")
+                .as("Check the pet is created correctly")
                 .usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(pet);
@@ -42,7 +42,7 @@ class PetApiIntegrationTest extends TestBase {
 
     @ParameterizedTest
     @MethodSource("io.github.timofeevvr.petstore.DataProvider#petProvider")
-    void deletePetSuccessfullyRemovesPetFromTheStore(Pet pet) {
+    void petDeleteMethodSuccessfullyRemovesPetFromTheStore(Pet pet) {
         // given
         var createdPetId = petstoreSteps.addPet(pet).getId();
         // when

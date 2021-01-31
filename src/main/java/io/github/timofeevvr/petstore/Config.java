@@ -30,13 +30,11 @@ public class Config {
 
         // RestAssured global configuration
         RestAssured.objectMapper(gson());
-//        TODO
-//        RestAssured.requestSpecification.auth().basic("api_key", "special-key");
-//        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 
         PrintStream logStream = IoBuilder.forLogger(log.getName()).buildPrintStream();
-        RestAssured.filters(RequestLoggingFilter.logRequestTo(logStream));
-        RestAssured.filters(ErrorLoggingFilter.logErrorsTo(logStream));
+        RestAssured.config = RestAssured.config().logConfig(LogConfig.logConfig().defaultStream(logStream));
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.filters(new LoggingFilter());
     }
 
     /**

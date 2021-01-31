@@ -1,12 +1,9 @@
 package io.github.timofeevvr.petstore;
 
-import io.github.timofeevvr.petstore.api.PetApi;
-import io.github.timofeevvr.petstore.api.StoreApi;
 import io.github.timofeevvr.petstore.model.Order;
 import io.github.timofeevvr.petstore.model.Pet;
 import io.qameta.allure.Step;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.Validatable;
 import io.restassured.response.ValidatableResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +13,8 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
 import static java.net.HttpURLConnection.HTTP_OK;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
@@ -101,8 +98,7 @@ public class PetstoreSteps {
                 .body(order)
                 .execute(Validatable::then)
                 .assertThat()
-                .statusCode(HTTP_OK)
-                .body("petId", is(order.getPetId()));
+                .statusCode(HTTP_OK);
     }
 
 
