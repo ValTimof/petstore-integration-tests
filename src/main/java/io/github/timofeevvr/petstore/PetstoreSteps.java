@@ -92,12 +92,14 @@ public class PetstoreSteps {
 
     @Step
     @com.epam.reportportal.annotations.Step
-    public void placeOrder(Order order) {
-        apiClient.store().placeOrder()
+    public Order placeOrder(Order order) {
+        return apiClient.store().placeOrder()
                 .body(order)
                 .execute(Validatable::then)
                 .assertThat()
-                .statusCode(HTTP_OK);
+                .statusCode(HTTP_OK)
+                .extract()
+                .as(Order.class);
     }
 
 

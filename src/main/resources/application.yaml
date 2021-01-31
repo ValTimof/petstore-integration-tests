@@ -1,2 +1,5 @@
 petstore:
   baseUrl: ${PETSTORE_URL:https://petstore.swagger.io/v2}
+spring:
+  main:
+    banner-mode: "off"

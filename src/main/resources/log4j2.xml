@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration packages="com.epam.ta.reportportal.log4j.appender">
     <properties>
-        <property name="pattern">%date{HH:mm:ss} %level (%file:%line) %method - %msg%n</property>
+        <property name="pattern">%date{HH:mm:ss} %level [%t] (%file:%line) %method - %msg%n</property>
     </properties>
     <appenders>
         <Console name="Console" target="SYSTEM_OUT">

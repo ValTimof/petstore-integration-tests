@@ -18,15 +18,14 @@ import java.util.stream.Stream;
 @Slf4j
 public class DataProvider {
 
-    private static final Gson gson = new JSON().getGson();
     private static final EasyRandom easyRandom = new EasyRandom();
+    private static final Gson gson = new JSON().getGson();
 
     private DataProvider() {
     }
 
     public static Stream<Order> orderProvider() {
         return Stream.generate(() -> easyRandom.nextObject(Order.class))
-                .map(o -> o.quantity(1))
                 .limit(4);
     }
 
