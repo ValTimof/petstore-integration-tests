@@ -17,6 +17,8 @@ repositories {
     jcenter()
     mavenLocal()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url "http://dl.bintray.com/epam/reportportal" }
 }
 
 dependencyManagement {
@@ -35,8 +37,9 @@ dependencyManagement {
         dependency 'io.swagger:swagger-annotations:1.5.15'
         dependency 'io.gsonfire:gson-fire:1.8.2'
         dependency 'com.squareup.okio:okio:1.13.0'
-        dependency 'com.epam.reportportal:client-java:5.0.12'
         dependency 'io.qameta.allure:allure-junit5:2.13.8'
+        dependency 'com.github.reportportal:agent-java-junit5:5.0.3'
+        dependency 'com.github.reportportal:logger-java-log4j:5.0.3'
     }
 }
 
@@ -53,8 +56,12 @@ dependencies {
     implementation 'io.rest-assured:rest-assured'
     implementation 'org.apache.logging.log4j:log4j-iostreams'
 
-    implementation 'com.epam.reportportal:client-java'
     implementation 'io.qameta.allure:allure-junit5'
+
+    implementation('com.github.reportportal:agent-java-junit5')  {
+        exclude group: 'org.junit.jupiter'
+    }
+    implementation 'com.github.reportportal:logger-java-log4j'
 
     testImplementation 'org.junit.platform:junit-platform-console'
 }
@@ -89,8 +96,8 @@ test {
 
     systemProperties([
             'PETSTORE_URL'                                  : System.getProperty('PETSTORE_URL', 'https://petstore.swagger.io/v2'),
-            'junit.jupiter.extensions.autodetection.enabled': System.getProperty('rp.enable', 'false'),
-            'rp.enable'                                     : System.getProperty('rp.enable', 'false')
+            'rp.enable'                                     : System.getProperty('rp.enable', 'false'),
+            'junit.jupiter.extensions.autodetection.enabled': System.getProperty('rp.enable', 'false')
     ])
 
     doFirst {
