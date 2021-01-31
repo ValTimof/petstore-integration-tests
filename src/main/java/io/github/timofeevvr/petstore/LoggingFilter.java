@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LoggingFilter implements Filter {
 
     /**
-     * Prints requests and respones to Slf4j logger.
+     * Prints requests and responses to Slf4j logger.
      */
     @Override
     public Response filter(FilterableRequestSpecification requestSpec, FilterableResponseSpecification responseSpec, FilterContext ctx) {

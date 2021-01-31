@@ -111,12 +111,10 @@ test {
     }
 }
 
-task downloadSwaggerJson {
-    doLast {
-        file('swagger-json/petstore.json').withOutputStream { os ->
-            new URL('https://petstore.swagger.io/v2/swagger.json').withInputStream { is ->
-                os << is
-            }
+def downloadSwaggerJson = { ->
+    file('swagger-json/petstore.json').withOutputStream { os ->
+        new URL('https://petstore.swagger.io/v2/swagger.json').withInputStream { is ->
+            os << is
         }
     }
 }
@@ -139,10 +137,15 @@ swaggerSources {
 }
 
 // Configure compile task dependency and source
-resolveSwaggerTemplate.dependsOn downloadSwaggerJson
+resolveSwaggerTemplate.doFirst { downloadSwaggerJson() }
 compileJava.dependsOn swaggerSources.petstore.code
 sourceSets.main.java.srcDir "${swaggerSources.petstore.code.outputDir}/src/main/java"
 sourceSets.main.resources.srcDir "${swaggerSources.petstore.code.outputDir}/src/main/resources"
+
+project.afterEvaluate {
+    downloadSwaggerJson()
+    generateSwaggerCodePetstore.exec()
+}
 
 clean {
     delete 'swagger-json/petstore.json'
