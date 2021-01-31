@@ -37,6 +37,7 @@ dependencyManagement {
         dependency 'io.swagger:swagger-annotations:1.5.15'
         dependency 'io.gsonfire:gson-fire:1.8.2'
         dependency 'com.squareup.okio:okio:1.13.0'
+        dependency 'org.jeasy:easy-random-core:5.0.0'
         dependency 'io.qameta.allure:allure-junit5:2.13.8'
         dependency 'com.github.reportportal:agent-java-junit5:5.0.3'
         dependency 'com.github.reportportal:logger-java-log4j:5.0.3'
@@ -54,11 +55,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
     implementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'io.rest-assured:rest-assured'
+    implementation 'org.jeasy:easy-random-core'
     implementation 'org.apache.logging.log4j:log4j-iostreams'
 
     implementation 'io.qameta.allure:allure-junit5'
 
-    implementation('com.github.reportportal:agent-java-junit5')  {
+    implementation('com.github.reportportal:agent-java-junit5') {
         exclude group: 'org.junit.jupiter'
     }
     implementation 'com.github.reportportal:logger-java-log4j'
@@ -96,6 +98,7 @@ test {
 
     systemProperties([
             'PETSTORE_URL'                                  : System.getProperty('PETSTORE_URL', 'https://petstore.swagger.io/v2'),
+            'rp.uuid'                                       : System.getProperty('rp.uuid', ''),
             'rp.enable'                                     : System.getProperty('rp.enable', 'false'),
             'junit.jupiter.extensions.autodetection.enabled': System.getProperty('rp.enable', 'false')
     ])
@@ -109,8 +112,8 @@ test {
 
 task downloadSwaggerJson {
     doLast {
-        file('swagger-json/petstore.json').withOutputStream {os ->
-            new URL('https://petstore.swagger.io/v2/swagger.json').withInputStream {is ->
+        file('swagger-json/petstore.json').withOutputStream { os ->
+            new URL('https://petstore.swagger.io/v2/swagger.json').withInputStream { is ->
                 os << is
             }
         }
@@ -145,7 +148,7 @@ clean {
 }
 
 checkstyle {
-    toolVersion = '8.38'
+    toolVersion = '8.39'
 }
 
 tasks.withType(Checkstyle) {
@@ -160,7 +163,6 @@ tasks.withType(Tar) {
 }
 
 // generate fat jar with tests
-
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 
 shadowJar {

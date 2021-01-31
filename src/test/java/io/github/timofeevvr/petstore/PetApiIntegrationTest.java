@@ -24,7 +24,7 @@ class PetApiIntegrationTest extends TestBase {
         createdPets.forEach(petstoreSteps::deletePet);
     }
 
-    @ParameterizedTest(name = "{displayName} {index}")
+    @ParameterizedTest(name = "[{index}] {displayName}")
     @MethodSource("io.github.timofeevvr.petstore.DataProvider#petProvider")
     void petPostMethodSuccessfullyAddsPetToTheStore(Pet pet) {
         // when
@@ -40,7 +40,7 @@ class PetApiIntegrationTest extends TestBase {
                 .isEqualTo(pet);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "[{index}] {displayName}")
     @MethodSource("io.github.timofeevvr.petstore.DataProvider#petProvider")
     void petDeleteMethodSuccessfullyRemovesPetFromTheStore(Pet pet) {
         // given

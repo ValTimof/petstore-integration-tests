@@ -1,15 +1,16 @@
 package io.github.timofeevvr.petstore;
 
 import com.google.gson.Gson;
+import io.github.timofeevvr.petstore.model.Order;
 import io.github.timofeevvr.petstore.model.Pet;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.jeasy.random.EasyRandom;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -18,8 +19,15 @@ import java.util.stream.Stream;
 public class DataProvider {
 
     private static final Gson gson = new JSON().getGson();
+    private static final EasyRandom easyRandom = new EasyRandom();
 
     private DataProvider() {
+    }
+
+    public static Stream<Order> orderProvider() {
+        return Stream.generate(() -> easyRandom.nextObject(Order.class))
+                .map(o -> o.quantity(1))
+                .limit(4);
     }
 
     public static Stream<Pet> petProvider() {
@@ -31,12 +39,13 @@ public class DataProvider {
         return gson.fromJson(jsonString, classOfT);
     }
 
+    @SneakyThrows
     public static String readResourceFileToString(String path) {
         try (InputStream is = new ClassPathResource(path).getInputStream()) {
             return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
         } catch (IOException e) {
             log.error(e.getMessage());
-            throw new UncheckedIOException("Resource file doesn't exists " + path, e);
+            throw new IOException("Resource file doesn't exists " + path, e);
         }
     }
 }

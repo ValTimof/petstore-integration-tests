@@ -2,10 +2,6 @@ package io.github.timofeevvr.petstore;
 
 import io.restassured.RestAssured;
 import io.restassured.config.LogConfig;
-import io.restassured.config.RestAssuredConfig;
-import io.restassured.filter.log.ErrorLoggingFilter;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.assertj.core.api.Assertions;
@@ -38,7 +34,7 @@ public class Config {
     }
 
     /**
-     * Add 'threadlocal' scope to create new object for each thread
+     * Add 'threadlocal' scope to create new object for each thread.
      */
     @Bean
     public static CustomScopeConfigurer threadLocalScopeRegistration() {

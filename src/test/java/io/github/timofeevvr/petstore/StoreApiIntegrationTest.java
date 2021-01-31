@@ -6,6 +6,7 @@ import io.restassured.filter.log.ErrorLoggingFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -18,20 +19,16 @@ import static org.hamcrest.Matchers.notNullValue;
 @Tag("store")
 class StoreApiIntegrationTest extends TestBase {
 
-    @ParameterizedTest
-    @ValueSource(longs = {1, 2, 5, 10})
-    void givenExistingPet_whenPlaceOrderForThePet_thenOrderStatusIsPlaced(long orderId) {
+    @ParameterizedTest(name = "[{index}] {displayName}")
+    @MethodSource("io.github.timofeevvr.petstore.DataProvider#orderProvider")
+    void givenExistingPet_whenPlaceOrderForThePet_thenOrderStatusIsPlaced(Order order) {
         // given
         var existingPetId = petstoreSteps.findPetsByStatus(Pet.StatusEnum.AVAILABLE)[0].getId();
-        var order = new Order()
-                .id(orderId)
-                .petId(existingPetId)
-                .quantity(1)
-                .status(Order.StatusEnum.PLACED);
+        order.setPetId(existingPetId);
         // when
         petstoreSteps.placeOrder(order);
         // then
-        petstoreSteps.getExistingOrder(orderId)
+        petstoreSteps.getExistingOrder(order.getId())
                 .assertThat()
                 .body("status", equalTo(Order.StatusEnum.PLACED.getValue()));
     }
