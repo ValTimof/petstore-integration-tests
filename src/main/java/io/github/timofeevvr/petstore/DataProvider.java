@@ -24,12 +24,12 @@ public class DataProvider {
     private DataProvider() {
     }
 
-    public static Stream<Order> orderProvider() {
+    public static Stream<Order> randomOrders() {
         return Stream.generate(() -> easyRandom.nextObject(Order.class))
                 .limit(4);
     }
 
-    public static Stream<Pet> petProvider() {
+    public static Stream<Pet> petsFromTestdata() {
         return Arrays.stream(fromJson("testdata/pets.json", Pet[].class));
     }
 

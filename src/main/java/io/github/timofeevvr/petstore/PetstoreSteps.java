@@ -12,8 +12,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
+
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static org.hamcrest.Matchers.greaterThan;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
@@ -34,6 +40,7 @@ public class PetstoreSteps {
     @Step
     @com.epam.reportportal.annotations.Step
     public Pet addPet(Pet pet) {
+        log.info("Adding pet {}", pet.getName());
         return apiClient.pet().addPet()
                 .body(pet)
                 .execute(Validatable::then)
@@ -44,8 +51,6 @@ public class PetstoreSteps {
                 .as(Pet.class);
     }
 
-    @Step
-    @com.epam.reportportal.annotations.Step
     public Pet getExistingPet(Long petId) {
         return getPet(petId)
                 .assertThat()
@@ -54,7 +59,10 @@ public class PetstoreSteps {
                 .as(Pet.class);
     }
 
+    @Step
+    @com.epam.reportportal.annotations.Step
     public ValidatableResponse getPet(Long petId) {
+        log.info("Getting pet {}", petId);
         return apiClient.pet().getPetById()
                 .petIdPath(petId)
                 .execute(Validatable::then);
@@ -67,32 +75,42 @@ public class PetstoreSteps {
     }
 
     public void deletePet(Long petId) {
+        log.info("Deleting pet {}", petId);
         apiClient.pet().deletePet()
                 .petIdPath(petId)
                 .execute(Validatable::then)
-                .statusCode(HTTP_OK);
+                .assertThat()
+                // sometimes returns 404 probably because the pet was deleted by another user
+                .statusCode(anyOf(is(HTTP_OK), is(HTTP_NOT_FOUND)));
     }
 
+    public Pet[] findAllPets() {
+        return findPetsByStatus(List.of(Pet.StatusEnum.values()));
+    }
+
+    public Pet[] findPetsByStatus(Pet.StatusEnum status) {
+        return findPetsByStatus(singletonList(status));
+    }
 
     @Step
     @com.epam.reportportal.annotations.Step
-    public Pet[] findPetsByStatus(Pet.StatusEnum status) {
+    public Pet[] findPetsByStatus(Collection<Pet.StatusEnum> statuses) {
+        log.info("Find pet with statuses {}", statuses);
         return apiClient.pet()
                 .findPetsByStatus()
-                .statusQuery(status)
+                .statusQuery(statuses.toArray(new Object[0]))
                 .execute(Validatable::then)
                 .assertThat()
                 .statusCode(HTTP_OK)
                 .body(notNullValue())
-                .body("size()", greaterThan(0))
                 .extract()
                 .as(Pet[].class);
     }
 
-
     @Step
     @com.epam.reportportal.annotations.Step
     public Order placeOrder(Order order) {
+        log.info("Placing order for pet with id {}", order.getPetId());
         return apiClient.store().placeOrder()
                 .body(order)
                 .execute(Validatable::then)
@@ -102,16 +120,16 @@ public class PetstoreSteps {
                 .as(Order.class);
     }
 
-
-    @Step
-    @com.epam.reportportal.annotations.Step
     public ValidatableResponse getExistingOrder(Long orderId) {
         return getOrder(orderId)
                 .assertThat()
                 .statusCode(HTTP_OK);
     }
 
+    @Step
+    @com.epam.reportportal.annotations.Step
     public ValidatableResponse getOrder(Long orderId) {
+        log.info("Getting order {}", orderId);
         return apiClient.store().getOrderById()
                 .orderIdPath(orderId)
                 .execute(Validatable::then);
