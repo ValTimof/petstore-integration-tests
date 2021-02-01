@@ -111,20 +111,16 @@ test {
     }
 }
 
-def downloadSwaggerJson = { ->
-    file('swagger-json/petstore.json').withOutputStream { os ->
-        new URL('https://petstore.swagger.io/v2/swagger.json').withInputStream { is ->
-            os << is
-        }
-    }
+ext {
+    petstoreSwaggerFile = file('codegen/swagger-petstore.json')
 }
 
 swaggerSources {
     petstore {
-        inputFile = file('swagger-json/petstore.json')
+        inputFile = petstoreSwaggerFile
         code {
             language = 'java'
-            configFile = file('codegen-config.json')
+            configFile = file('codegen/config.json')
             components = [
                     models         : true,
                     modelDocs      : false,
@@ -137,18 +133,25 @@ swaggerSources {
 }
 
 // Configure compile task dependency and source
-resolveSwaggerTemplate.doFirst { downloadSwaggerJson() }
 compileJava.dependsOn swaggerSources.petstore.code
 sourceSets.main.java.srcDir "${swaggerSources.petstore.code.outputDir}/src/main/java"
 sourceSets.main.resources.srcDir "${swaggerSources.petstore.code.outputDir}/src/main/resources"
 
-project.afterEvaluate {
-    downloadSwaggerJson()
-    generateSwaggerCodePetstore.exec()
+task downloadSwaggerJson {
+    doLast {
+        petstoreSwaggerFile.withOutputStream { os ->
+            new URL('https://petstore.swagger.io/v2/swagger.json').withInputStream { is ->
+                os << is
+            }
+        }
+    }
 }
 
-clean {
-    delete 'swagger-json/petstore.json'
+project.afterEvaluate {
+    if (!file("${swaggerSources.petstore.code.outputDir}").exists()) {
+        // generate code on load gradle project
+        generateSwaggerCodePetstore.exec()
+    }
 }
 
 pmd {
