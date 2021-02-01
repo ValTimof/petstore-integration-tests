@@ -99,10 +99,12 @@ test {
 
     systemProperties([
             'PETSTORE_URL'                                  : System.getProperty('PETSTORE_URL', 'https://petstore.swagger.io/v2'),
-            'rp.uuid'                                       : System.getProperty('rp.uuid', ''),
             'rp.enable'                                     : System.getProperty('rp.enable', 'false'),
             'junit.jupiter.extensions.autodetection.enabled': System.getProperty('rp.enable', 'false')
     ])
+    if (!System.getProperty('rp.uuid', '').isEmpty()) {
+        systemProperty 'rp.uuid', System.getProperty('rp.uuid')
+    }
 
     doFirst {
         // add aspectJ javaagent for ReportPortal @Step to be loaded

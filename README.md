@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/timofeevvr/petstore-integration-tests/workflows/build/badge.svg)](https://github.com/timofeevvr/petstore-integration-tests/actions)
+[![Java CI with Gradle](https://github.com/timofeevvr/petstore-integration-tests/workflows/Java%20CI%20with%20Gradle/badge.svg)](https://github.com/timofeevvr/petstore-integration-tests/actions)
 
 # petstore-integration-tests
 A sample test automation framework 
