@@ -1,103 +1,224 @@
 plugins {
     id 'java'
-    id "io.freefair.lombok" version "4.1.4"
-    id "org.hidetake.swagger.generator" version "2.18.1"
-    id "org.springframework.boot" version "2.2.1.RELEASE"
-    id "io.spring.dependency-management" version "1.0.8.RELEASE"
+    id 'pmd'
+    id 'checkstyle'
+    id 'io.qameta.allure' version '2.8.1'
+    id 'io.freefair.lombok' version '5.3.0'
+    id 'com.github.spotbugs' version '4.6.0'
+    id 'org.hidetake.swagger.generator' version '2.18.2'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
 group 'com.petstore'
-version '1.0-SNAPSHOT'
+version '0.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.11
 
-ext['junit-jupiter.version'] = '5.5.2'
-ext {
-    swagger_codegen_version = "2.4.2"
-    swagger_annotations_version = "1.5.15"
-    gson_fire_version = "1.8.2"
-    okio_version = "1.13.0"
-}
-
 repositories {
     jcenter()
+    mavenLocal()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url "http://dl.bintray.com/epam/reportportal" }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom('org.junit:junit-bom:5.7.0')
+        mavenBom('org.springframework.boot:spring-boot-dependencies:2.3.8.RELEASE') {
+            bomProperties([
+                    'rest-assured.version' : '3.3.0',
+                    'junit-jupiter.version': '5.7.0',
+                    'assertj.version'      : '3.19.0'
+            ])
+        }
+    }
+    dependencies {
+        dependency 'io.swagger:swagger-codegen-cli:2.4.2'
+        dependency 'io.swagger:swagger-annotations:1.5.15'
+        dependency 'io.gsonfire:gson-fire:1.8.2'
+        dependency 'com.squareup.okio:okio:1.13.0'
+        dependency 'org.jeasy:easy-random-core:5.0.0'
+        dependency 'io.qameta.allure:allure-junit5:2.13.8'
+        dependency 'com.github.reportportal:agent-java-junit5:5.0.3'
+        dependency 'com.github.reportportal:logger-java-log4j:5.0.3'
+    }
 }
 
 dependencies {
-    swaggerCodegen "io.swagger:swagger-codegen-cli:$swagger_codegen_version"
-    implementation "io.swagger:swagger-annotations:$swagger_annotations_version"
-    implementation "io.gsonfire:gson-fire:$gson_fire_version"
-    implementation "com.squareup.okio:okio:$okio_version"
-    implementation "org.springframework.boot:spring-boot-starter"
+    swaggerCodegen 'io.swagger:swagger-codegen-cli'
+
+    implementation 'io.swagger:swagger-annotations'
+    implementation 'io.gsonfire:gson-fire'
+    implementation 'com.squareup.okio:okio'
+
+    implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
-    implementation "io.rest-assured:rest-assured"
-    implementation "org.apache.logging.log4j:log4j-iostreams"
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.junit.platform:junit-platform-console"
+    implementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'io.rest-assured:rest-assured'
+    implementation 'org.jeasy:easy-random-core'
+
+    implementation 'io.qameta.allure:allure-junit5'
+
+    implementation('com.github.reportportal:agent-java-junit5') {
+        exclude group: 'org.junit.jupiter'
+    }
+    implementation 'com.github.reportportal:logger-java-log4j'
+
+    testImplementation 'org.junit.platform:junit-platform-console'
 }
 
 configurations.all {
     exclude module: 'spring-boot-starter-logging'
 }
 
-task downloadSwaggerJson {
-    doLast {
-        def file = new FileOutputStream('codegen/petstore.json')
-        def out = new BufferedOutputStream(file)
-        out << new URL("https://petstore.swagger.io/v2/swagger.json").openStream()
-        out.close()
+allure {
+    autoconfigure = true
+    version = '2.13.8'
+
+    useJUnit5 {
+        version = '2.13.8'
     }
+}
+
+test {
+    useJUnitPlatform() {
+        if (System.getProperty('includeTags')) {
+            includeTags System.getProperty('includeTags').split(',')
+        }
+        if (System.getProperty('excludeTags')) {
+            includeTags System.getProperty('excludeTags').split(',')
+        }
+    }
+
+    testLogging {
+        exceptionFormat 'full'
+        events 'started', 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+    }
+
+    systemProperties([
+            'PETSTORE_URL'                                  : System.getProperty('PETSTORE_URL', 'https://petstore.swagger.io/v2'),
+            'rp.uuid'                                       : System.getProperty('rp.uuid', ''),
+            'rp.enable'                                     : System.getProperty('rp.enable', 'false'),
+            'junit.jupiter.extensions.autodetection.enabled': System.getProperty('rp.enable', 'false')
+    ])
+
+    doFirst {
+        // add aspectJ javaagent for ReportPortal @Step to be loaded
+        def weaver = configurations.testRuntimeClasspath.find { it.name.contains("aspectjweaver") }
+        jvmArgs += "-javaagent:$weaver"
+    }
+}
+
+ext {
+    petstoreSwaggerFile = file('codegen/swagger-petstore.json')
 }
 
 swaggerSources {
     petstore {
-        inputFile = file('codegen/petstore.json')
+        inputFile = petstoreSwaggerFile
         code {
             language = 'java'
-            configFile = file('codegen/codegen-config.json')
+            configFile = file('codegen/config.json')
             components = [
-                    models: true,
-                    modelDocs: false,
-                    apis: ['Store', 'Pet'],
-                    apiTests: false,
-                    supportingFiles: ['ApiClient.java', 'JSON.java']
+                    models         : true,
+                    modelDocs      : false,
+                    apis           : ['Store', 'Pet'],
+                    apiTests       : false,
+                    supportingFiles: ['ApiClient.java', 'GsonObjectMapper.java', 'JSON.java']
             ]
         }
     }
 }
 
 // Configure compile task dependency and source
-resolveSwaggerTemplate.dependsOn downloadSwaggerJson
 compileJava.dependsOn swaggerSources.petstore.code
 sourceSets.main.java.srcDir "${swaggerSources.petstore.code.outputDir}/src/main/java"
 sourceSets.main.resources.srcDir "${swaggerSources.petstore.code.outputDir}/src/main/resources"
 
-bootJar {
+task downloadSwaggerJson {
+    doLast {
+        petstoreSwaggerFile.withOutputStream { os ->
+            new URL('https://petstore.swagger.io/v2/swagger.json').withInputStream { is ->
+                os << is
+            }
+        }
+    }
+}
+
+project.afterEvaluate {
+    if (!file("${swaggerSources.petstore.code.outputDir}").exists()) {
+        // generate code on load gradle project
+        generateSwaggerCodePetstore.exec()
+    }
+}
+
+pmd {
+    toolVersion = '6.21.0'
+    ignoreFailures = false
+    consoleOutput = true
+    ruleSets = []
+    ruleSetFiles = files('config/pmd/ruleSet.xml')
+}
+
+pmdMain {
+    exclude '**/api/*', '**/model/*', '**/ApiClient.java', '**/GsonObjectMapper.java', '**/JSON.java'
+}
+
+checkstyle {
+    toolVersion = '8.39'
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+spotbugs {
+    toolVersion = '4.2.0'
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+    ignoreFailures = false
+    excludeFilter = file('config/spotBugs/exclude.xml')
+    reports {
+        html {
+            enabled = true
+        }
+    }
+}
+
+tasks.withType(Tar) {
+    compression = Compression.GZIP
+}
+
+// generate fat jar with tests
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+
+shadowJar {
     zip64 true
+    classifier ''
     archiveVersion.set ''
-    mainClassName = 'org.junit.platform.console.ConsoleLauncher'
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(project.configurations.testRuntimeClasspath - project.configurations.runtimeClasspath) {
-        into 'BOOT-INF/lib'
+    duplicatesStrategy = DuplicatesStrategy.WARN
+    manifest {
+        attributes 'Main-Class': 'org.junit.platform.console.ConsoleLauncher'
     }
-    from(sourceSets.test.output) {
-        into 'BOOT-INF/classes'
-    }
-}
+    from sourceSets.test.output
+    configurations = [project.configurations.testRuntimeClasspath]
+    exclude '**/Log4j2Plugins.dat'
 
-clean {
-    delete 'codegen/petstore.json'
-}
-
-test {
-    useJUnitPlatform()
-
-    testLogging {
-        exceptionFormat "full"
-        events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+    // Required for Spring Boot
+    mergeServiceFiles()
+    append 'META-INF/spring.handlers'
+    append 'META-INF/spring.schemas'
+    append 'META-INF/spring.tooling'
+    transform(PropertiesFileTransformer) {
+        paths = ['META-INF/spring.factories']
+        mergeStrategy = "append"
     }
 }
 
-//test.enabled false
 generateLombokConfig.enabled false

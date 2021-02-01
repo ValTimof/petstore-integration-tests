@@ -1,7 +1,7 @@
-package com.petstore.integration.tests;
+package io.github.timofeevvr.petstore;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TestFramework {
+public class TestApplication {
 }

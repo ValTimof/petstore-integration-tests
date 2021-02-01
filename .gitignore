@@ -36,4 +36,6 @@ gradle-app.setting
 out/
 target/
 .DS_Store
-codegen/petstore.json
+swagger-json/
+report-portal/data/
+.allure/

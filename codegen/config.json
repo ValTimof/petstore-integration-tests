@@ -1,0 +1,8 @@
+{
+  "library": "rest-assured",
+  "modelPackage": "io.github.timofeevvr.petstore.model",
+  "apiPackage": "io.github.timofeevvr.petstore.api",
+  "invokerPackage": "io.github.timofeevvr.petstore",
+  "dateLibrary": "java8",
+  "hideGenerationTimestamp": true
+}
