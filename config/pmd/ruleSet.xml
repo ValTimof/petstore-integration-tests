@@ -11,11 +11,14 @@
 
 
     <rule ref="category/java/errorprone.xml">
+        <exclude name="AvoidCatchingThrowable"/>
         <exclude name="AvoidLiteralsInIfCondition"/>
         <exclude name="BeanMembersShouldSerialize"/>
         <exclude name="UseLocaleWithCaseConversions"/>
     </rule>
     <rule ref="category/java/bestpractices.xml">
+        <exclude name="AvoidReassigningParameters"/>
+        <exclude name="GuardLogStatement"/>
     </rule>
 
 </ruleset>

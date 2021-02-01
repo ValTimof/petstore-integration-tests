@@ -61,11 +61,8 @@ public class RetryableExtension implements InvocationInterceptor {
     }
 
     private int getRetries(ExtensionContext extensionContext) {
-        int retries = 0;
-        Optional<Method> testMethod = extensionContext.getTestMethod();
-        if (testMethod.isPresent()) {
-            retries = testMethod.get().getAnnotation(Retryable.class).value();
-        }
-        return retries;
+        return extensionContext.getTestMethod()
+                .map(method -> method.getAnnotation(Retryable.class).value())
+                .orElse(0);
     }
 }
